@@ -29,13 +29,6 @@ EXTRACT_TYPES = {
 
 
 """
-Replacing the handlers with the actual functions.
-"""
-for key, value in EXTRACT_TYPES.items():
-    value["handler"] = locals()[value["handler"]]
-
-
-"""
 Sorts the extract types by priority.
 """
 EXTRACT_TYPES = dict(sorted(EXTRACT_TYPES.items(), key=lambda item: item[0][1]))
@@ -75,6 +68,13 @@ def get_date_from_directory_name(file_path) -> Union[date, None]:
         if match:
             return conf["handler"](match)
     return None
+
+
+"""
+Replacing the handlers with the actual functions.
+"""
+for key, value in EXTRACT_TYPES.items():
+    value["handler"] = locals()[value["handler"]]
 
 
 # Metadata option is not fully implemented yet

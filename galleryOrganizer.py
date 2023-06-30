@@ -7,7 +7,7 @@ def process_command_line_args():
     parser = argparse.ArgumentParser(description="Process optional command line arguments.")
 
     # Define the flags for each argument
-    parser.add_argument('--directory', action='store_true', help='The base directory to scan.')
+    parser.add_argument('--directory', type=str, help='The base directory to scan.')
     parser.add_argument('--keep-original-directory', action='store_true', help='Keep the original directory structure.')
     parser.add_argument('--dest-base-dir', type=str, help='Specify the base directory for destination.')
     parser.add_argument('--group-to-years', action='store_true', help='Group files into year-based directories.')

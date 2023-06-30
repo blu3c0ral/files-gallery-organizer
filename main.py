@@ -5,13 +5,12 @@ from configs import (
     KEEP_ORIGINAL_DIRECTORY,
     DEST_BASE_DIR,
     GROUP_TO_YEARS,
-    SEPERATOR,
+    SEPARATOR,
     FLIPPED,
     MOVE_FILES,
     FILE_EXTENSIONS,
 )
 from dateExtractor import DateExtractor
-
 
 def year_month_dir(month, year) -> str:
     """
@@ -21,7 +20,7 @@ def year_month_dir(month, year) -> str:
     :return:
     """
 
-    return f"{year}{SEPERATOR}{month}" if FLIPPED else f"{month}{SEPERATOR}{year}"
+    return f"{year}{SEPARATOR}{month}" if FLIPPED else f"{month}{SEPARATOR}{year}"
 
 
 def get_destination_path(source_base_dir, source_path, month, year) -> str:
@@ -37,8 +36,8 @@ def get_destination_path(source_base_dir, source_path, month, year) -> str:
     destination_path = DEST_BASE_DIR
 
     if GROUP_TO_YEARS:
-        destination_path = os.path.join(destination_path, year)
-        destination_path = os.path.join(destination_path, month)
+        destination_path = os.path.join(destination_path, str(year))
+        destination_path = os.path.join(destination_path, str(month))
     else:
         destination_path = os.path.join(destination_path, year_month_dir(month, year))
 
@@ -79,8 +78,10 @@ def process_file(source_base_dir, file_path, extractor) -> None:
 
     print(f"Moving file: {file_path} to: {destination_path}")
 
+    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+
     if MOVE_FILES:
-        os.rename(file_path, destination_path)
+        shutil.move(file_path, destination_path)
     else:
         shutil.copy(file_path, destination_path)
 
@@ -92,13 +93,14 @@ def process_directory(directory) -> None:
     :param functions_list: A list of functions to be used for extracting the date
     """
 
+    file_exts = [x.lower() for x in FILE_EXTENSIONS]
     extractor = DateExtractor()
     for root, dirs, files in os.walk(directory):
         for file in files:
             file_path = os.path.join(root, file)
             file_extension = os.path.splitext(file)[1][1:]  # Get the file extension without the dot
 
-            if file_extension.lower() in [x.lower() for x in FILE_EXTENSIONS]:
+            if file_extension.lower() in file_exts:
                 process_file(
                     source_base_dir=directory,
                     file_path=file_path,
@@ -118,18 +120,18 @@ def main(directory, configs=None):
         global KEEP_ORIGINAL_DIRECTORY
         global DEST_BASE_DIR
         global GROUP_TO_YEARS
-        global SEPERATOR
+        global SEPARATOR
         global FLIPPED
         global MOVE_FILES
         global FILE_EXTENSIONS
 
-        KEEP_ORIGINAL_DIRECTORY = configs.KEEP_ORIGINAL_DIRECTORY or KEEP_ORIGINAL_DIRECTORY
-        DEST_BASE_DIR = configs.DEST_BASE_DIR or DEST_BASE_DIR
-        GROUP_TO_YEARS = configs.GROUP_TO_YEARS or GROUP_TO_YEARS
-        SEPERATOR = configs.SEPERATOR or SEPERATOR
-        FLIPPED = configs.FLIPPED or FLIPPED
-        MOVE_FILES = configs.MOVE_FILES or MOVE_FILES
-        FILE_EXTENSIONS = configs.FILE_EXTENSIONS or FILE_EXTENSIONS
+        KEEP_ORIGINAL_DIRECTORY = configs.keep_original_directory or KEEP_ORIGINAL_DIRECTORY
+        DEST_BASE_DIR = configs.dest_base_dir or DEST_BASE_DIR
+        GROUP_TO_YEARS = configs.group_to_years or GROUP_TO_YEARS
+        SEPARATOR = configs.separator or SEPARATOR
+        FLIPPED = configs.flipped or FLIPPED
+        MOVE_FILES = configs.move_files or MOVE_FILES
+        FILE_EXTENSIONS = configs.file_extensions or FILE_EXTENSIONS
 
     process_directory(directory)
 

@@ -71,7 +71,7 @@ If GROUP_TO_YEARS is set to True, this setting will be ignored.
 For example, if you set the seperator to "-", the year and month directories will be named like this:
 2020-01
 """
-SEPERATOR = "-"
+SEPARATOR = "-"
 
 
 """

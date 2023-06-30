@@ -8,13 +8,14 @@ from typing import Union
 YYYY = r"(20\d{2})"  # Year
 mm = r"(0[1-9]|1[0-2])"  # Month
 DD = r"(0[1-9]|[12]\d|3[01])"  # Day
-HH = r"[0-1][0-9]|2[0-3]"  # Hours
-MM = r"[0-5][0-9]"  # Minutes
-SS = r"[0-5][0-9]"  # Seconds
+HH = r"([0-1][0-9]|2[0-3])"  # Hours
+MM = r"([0-5][0-9])"  # Minutes
+SS = r"([0-5][0-9])"  # Seconds
 
 YYYYmm = YYYY + mm
 YYYYmmDD = YYYY + mm + DD
-YYYYmmDD_HHMMSS = YYYYmmDD + r"_" + HH + MM + SS
+HHMMSS = HH + MM + SS
+YYYYmmDD_HHMMSS = YYYYmmDD + r"_" + HHMMSS
 
 """
 The patterns for the different types of optional files or directories.
@@ -36,7 +37,7 @@ FILE_PATTERNS = {
         "handler": "extract_from_yyyymmdd_patterns"
     },
     "whatsapp": {
-        "pattern": r"^IMG-" + YYYYmmDD + r"-WA\d+",
+        "pattern": r"^(?:IMG|VID)-" + YYYYmmDD + r"-WA\d+",
         "compiled": None,
         "handler": "extract_from_yyyymmdd_patterns"
     },
@@ -47,6 +48,11 @@ FILE_PATTERNS = {
     },
     "date-": {
         "pattern": YYYY + r"-" + mm + r"-" + DD,
+        "compiled": None,
+        "handler": "extract_from_yyyymmdd_patterns"
+    },
+    "screenshot": {
+        "pattern": r"^Screenshot_" + YYYYmmDD + "-" + HHMMSS,
         "compiled": None,
         "handler": "extract_from_yyyymmdd_patterns"
     },
@@ -73,15 +79,6 @@ for key, value in FILE_PATTERNS.items():
 
 for key, value in DIR_PATTERNS.items():
     value["compiled"] = re.compile(value["pattern"])
-
-
-"""
-Replacing the handlers with the actual functions.
-"""
-for key, value in FILE_PATTERNS.items():
-    value["handler"] = locals()[value["handler"]]
-for key, value in DIR_PATTERNS.items():
-    value["handler"] = locals()[value["handler"]]
 
 
 ########################################################################################################################
@@ -115,3 +112,17 @@ def extract_from_yyyymm_patterns(match: re.Match) -> Union[date, None]:
         return to_date(match.group(1) + match.group(2) + "01")
     except ValueError:
         return None
+
+
+########################################################################################################################
+# End of utility functions                                                                                             #
+########################################################################################################################
+
+
+"""
+Replacing the handlers with the actual functions.
+"""
+for key, value in FILE_PATTERNS.items():
+    value["handler"] = locals()[value["handler"]]
+for key, value in DIR_PATTERNS.items():
+    value["handler"] = locals()[value["handler"]]
